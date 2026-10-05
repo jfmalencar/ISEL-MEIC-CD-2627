@@ -18,6 +18,9 @@ public class PrimesClient {
     private static ServiceGrpc.ServiceStub noBlockStub;
 
     public static void main(String[] args) throws InterruptedException {
+        if (args.length == 2) {
+            svcIP = args[0]; svcPort = Integer.parseInt(args[1]);
+        }
         CountDownLatch latch = new CountDownLatch(5);
 
         System.out.println("connect to " + svcIP + ":" + svcPort);
