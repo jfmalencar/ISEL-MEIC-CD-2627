@@ -10,7 +10,7 @@ public class GrpcClient {
 
     public static void main(String[] args) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("localhost", 50051)
+                .forAddress("34.51.164.190", 50051)
                 .usePlaintext()
                 .build();
 
