@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "contracts_discovery";
+
+package discovery; // package do proto
+
+service Discovery {
+  // Obter o endereço do servidor
+  rpc getServer(ProtoVoid) returns (GetServerResult);
+}
+
+message ProtoVoid {}
+
+message GetServerResult {string server_address = 1; string port = 2;}

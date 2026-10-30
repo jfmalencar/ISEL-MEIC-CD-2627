@@ -4,7 +4,7 @@ Três projetos Gradle independentes, equivalentes aos projetos Maven originais:
 
 | Projeto         | Conteúdo                                         |
 |-----------------|--------------------------------------------------|
-| `grpcContract`  | `ServiceContract.proto` → stubs Java (`servicestubs`) |
+| `grpcContract`  | `Execution.proto` → stubs Java (`servicestubs`) |
 | `grpcServerApp` | Servidor gRPC (`grpcserverapp.GrpcServer`)       |
 | `grpcClientApp` | Cliente gRPC com menu (`grpcclientapp.Client`)   |
 

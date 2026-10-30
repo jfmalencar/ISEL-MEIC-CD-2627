@@ -5,7 +5,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-import servicestubs.*;
+import contracts.execution.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -14,8 +14,8 @@ public class Client {
     private static String svcIP = "localhost";
     private static int svcPort = 8000;
     private static ManagedChannel channel;
-    private static ServiceGrpc.ServiceBlockingStub blockingStub;
-    private static ServiceGrpc.ServiceStub noBlockStub;
+    private static ExecutionGrpc.ExecutionBlockingStub blockingStub;
+    private static ExecutionGrpc.ExecutionStub noBlockStub;
 
     public static void main(String[] args) {
         try {

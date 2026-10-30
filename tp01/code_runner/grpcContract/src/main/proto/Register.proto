@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "contracts_registration";
+
+package register; // package do proto
+
+service Register {
+  // Registo: um RunServer indica o seu IP e porto e recebe o endereço do REDIS
+  rpc register(RegisterRequest) returns (RegisterResult);
+}
+
+message RegisterRequest { string ip_address = 1; string port = 2; }
+message RegisterResult   { string redis_address = 1; }

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "contracts.execution";
+
+package execution; // package do proto
+
+service Execution {
+  // Obter o endereço do servidor
+  rpc submit(stream FileBlock) returns (RequestId);
+
+  rpc getResult(RequestId) returns (stream ResultBlock);
+}
+
+message RequestId {string id = 1;}
+
+message FileBlock {
+  oneof content {
+    bytes program_chunk = 1;
+    bytes input_chunk = 2;
+  }
+}
+
+enum RequestStatus {
+  UNKNOWN = 0;
+  PENDING = 1;
+  COMPLETE = 2;
+  TIMEOUT = 3;
+  ERROR = 4;
+}
+
+message ResultBlock {
+  oneof content {
+    RequestStatus status = 1;
+    bytes output_chunk = 2;
+    bytes error_chunk = 3;
+  }
+}
