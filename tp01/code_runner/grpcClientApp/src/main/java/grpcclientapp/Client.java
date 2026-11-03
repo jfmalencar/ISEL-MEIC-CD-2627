@@ -23,12 +23,9 @@ public class Client {
     // generic ClientApp for Calling a grpc Service
     private static String managerIP = "localhost";
     private static int managerPort = 8000;
-    private static ManagedChannel managerChannel;
-    private static ManagedChannel  serverChannel;
     private static ExecutionGrpc.ExecutionBlockingStub blockingStub;
     private static ExecutionGrpc.ExecutionStub noBlockStub;
-    private static DiscoveryGrpc.DiscoveryBlockingStub discoveryBlockingStub;
-    private static Scanner scan = new Scanner(System.in);
+    private static final Scanner scan = new Scanner(System.in);
 
 
     public static void main(String[] args) {
@@ -37,13 +34,16 @@ public class Client {
                 managerIP = args[0]; managerPort = Integer.parseInt(args[1]);
             }
             System.out.println("connect to " + managerIP + ":" + managerPort);
-            managerChannel = ManagedChannelBuilder.forAddress(managerIP, managerPort)
+            // Channels are secure by default (via SSL/TLS).
+            // For the example we disable TLS to avoid
+            // needing certificates.
+            ManagedChannel managerChannel = ManagedChannelBuilder.forAddress(managerIP, managerPort)
                     // Channels are secure by default (via SSL/TLS).
                     // For the example we disable TLS to avoid
                     // needing certificates.
                     .usePlaintext()
                     .build();
-            discoveryBlockingStub = DiscoveryGrpc.newBlockingStub(managerChannel);
+            DiscoveryGrpc.DiscoveryBlockingStub discoveryBlockingStub = DiscoveryGrpc.newBlockingStub(managerChannel);
 
             GetServerResult serverResult =  discoveryBlockingStub.getServer(ProtoVoid.newBuilder().build());
             String runServerIP = serverResult.getServerAddress();
@@ -51,7 +51,7 @@ public class Client {
             managerChannel.shutdown();
             System.out.println("run server received " + runServerIP + ":" + runServerPort);
 
-            serverChannel = ManagedChannelBuilder.forAddress(runServerIP, runServerPort).usePlaintext().build();
+            ManagedChannel serverChannel = ManagedChannelBuilder.forAddress(runServerIP, runServerPort).usePlaintext().build();
             blockingStub = ExecutionGrpc.newBlockingStub(serverChannel);
             noBlockStub  = ExecutionGrpc.newStub(serverChannel);
 
