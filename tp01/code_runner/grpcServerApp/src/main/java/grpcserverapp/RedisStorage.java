@@ -1,10 +1,15 @@
 package grpcserverapp;
 
+import contracts.execution.RequestStatus;
 import redis.clients.jedis.RedisClient;
 import redis.clients.jedis.params.SetParams;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class RedisStorage {
 
+    static final String RUN_SERVERS_KEY = "runservers";
     final String publicAddress = "127.0.0.1";
     final String host = "localhost";
     final int port = 6379;
@@ -58,6 +63,33 @@ public class RedisStorage {
         } catch (Exception e) {
             System.err.println("Error deleting Redis key: " + e.getMessage());
         }
+    }
+
+    public void addRunServer(String address) {
+        requireRedis().sadd(RUN_SERVERS_KEY, address);
+    }
+
+    public Set<String> getRunServers() {
+        Set<String> servers = requireRedis().smembers(RUN_SERVERS_KEY);
+        return servers == null ? Collections.emptySet() : servers;
+    }
+
+    public int getPendingCount(String serverAddress) {
+        int pending = 0;
+        for (String requestKey : requireRedis().keys("request:*")) {
+            if (RequestStatus.PENDING.name().equals(requireRedis().hget(requestKey, "status"))
+                    && serverAddress.equals(requireRedis().hget(requestKey, "server"))) {
+                pending++;
+            }
+        }
+        return pending;
+    }
+
+    private RedisClient requireRedis() {
+        if (redis == null) {
+            throw new IllegalStateException("Redis client not initialized");
+        }
+        return redis;
     }
 
     /*

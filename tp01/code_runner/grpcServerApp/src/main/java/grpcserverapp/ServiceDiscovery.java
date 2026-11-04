@@ -3,35 +3,71 @@ package grpcserverapp;
 import contracts.discovery.DiscoveryGrpc;
 import contracts.discovery.GetServerResult;
 import contracts.discovery.ProtoVoid;
-import contracts.registration.RegisterGrpc;
-import contracts.registration.RegisterRequest;
-import contracts.registration.RegisterResult;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 public class ServiceDiscovery extends DiscoveryGrpc.DiscoveryImplBase {
 
-    RedisStorage storage;
-    Integer serversRegistered = 0;
+    private final RedisStorage storage;
+    private int tieBreaker;
 
-    public ServiceDiscovery(int svcPort) {
+    public ServiceDiscovery(int svcPort, RedisStorage storage) {
         System.out.println("Service is available on port:" + svcPort);
-        storage = new RedisStorage();
-        storage.start();
+        this.storage = storage;
     }
 
-    /*@Override
+    @Override
     public void getServer(ProtoVoid obj, StreamObserver<GetServerResult> responseObserver) {
         try {
-            storage.set("servers:" + serversRegistered, ipAddress + ":" + Integer.toString(atPort), null);
-
-            RegisterResult result = RegisterResult.newBuilder()
-                    .setRedisAddress(storage.publicAddress + ":" + storage.port)
+            String server = selectServer();
+            String[] address = server.split(":", 2);
+            GetServerResult result = GetServerResult.newBuilder()
+                    .setServerAddress(address[0])
+                    .setPort(address[1])
                     .build();
             responseObserver.onNext(result);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            responseObserver.onError(Status.UNAVAILABLE
+                    .withDescription(e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
         }
     }
-     */
+
+    private synchronized String selectServer() {
+        Set<String> servers = storage.getRunServers();
+        if (servers.isEmpty()) {
+            throw Status.UNAVAILABLE
+                    .withDescription("no RunServer is registered")
+                    .asRuntimeException();
+        }
+
+        List<String> ordered = new ArrayList<>(servers);
+        ordered.sort(Comparator.naturalOrder());
+        int start = tieBreaker++ % ordered.size();
+        Collections.rotate(ordered, -start);
+
+        int lowestPending = Integer.MAX_VALUE;
+        String selected = null;
+        for (String server : ordered) {
+            int pending = storage.getPendingCount(server);
+            if (pending < lowestPending) {
+                lowestPending = pending;
+                selected = server;
+            }
+        }
+        if (selected == null) {
+            throw Status.UNAVAILABLE
+                    .withDescription("no RunServer is available")
+                    .asRuntimeException();
+        }
+        return selected;
+    }
 }

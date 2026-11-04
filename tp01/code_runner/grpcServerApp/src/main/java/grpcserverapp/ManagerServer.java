@@ -11,10 +11,13 @@ public class ManagerServer {
     public static void main(String[] args) {
         try {
             if (args.length > 0) svcPort = Integer.parseInt(args[0]);
+            RedisStorage storage = new RedisStorage();
+            storage.start();
             io.grpc.Server svc = ServerBuilder.forPort(svcPort)
                     // Add one or more services.
                     // The Server can host many services in same TCP/IP port
-                    .addService(new ServiceRegister(svcPort))
+                    .addService(new ServiceRegister(svcPort, storage))
+                    .addService(new ServiceDiscovery(svcPort, storage))
                     .build();
             svc.start();
             System.out.println("Server started on port " + svcPort);

@@ -8,12 +8,10 @@ import io.grpc.stub.StreamObserver;
 public class ServiceRegister extends RegisterGrpc.RegisterImplBase{
 
     RedisStorage storage;
-    Integer serversRegistered = 0;
 
-    public ServiceRegister(int svcPort) {
+    public ServiceRegister(int svcPort, RedisStorage storage) {
         System.out.println("Service is available on port:" + svcPort);
-        storage = new RedisStorage();
-        storage.start();
+        this.storage = storage;
     }
 
     @Override
@@ -21,9 +19,11 @@ public class ServiceRegister extends RegisterGrpc.RegisterImplBase{
         try {
             String ipAddress = request.getIpAddress();
             int atPort = Integer.parseInt(request.getPort());
-            serversRegistered++;
 
-            storage.set("servers:" + serversRegistered, ipAddress + ":" + Integer.toString(atPort), null);
+            if (ipAddress.isBlank() || atPort < 1 || atPort > 65535) {
+                throw new IllegalArgumentException("invalid RunServer address");
+            }
+            storage.addRunServer(ipAddress + ":" + atPort);
 
             RegisterResult result = RegisterResult.newBuilder()
                     .setRedisAddress(storage.publicAddress + ":" + storage.port)
