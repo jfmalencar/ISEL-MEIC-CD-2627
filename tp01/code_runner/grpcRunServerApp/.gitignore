@@ -1,0 +1,10 @@
+.gradle/
+build/
+.kotlin/
+.idea/
+*.iml
+out/
+.DS_Store
+
+# pastas dos pedidos criadas pelo RunServer em execução
+requests/
