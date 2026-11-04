@@ -16,6 +16,10 @@ repositories {
 
 dependencies {
     implementation("isel.grpc:grpcContract:1.0")
+    implementation("redis.clients:jedis:8.0.1")
+
+    // SLF4J binding for Jedis logs (avoids startup warnings).
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.36")
 }
 
 tasks.withType<JavaCompile>().configureEach {

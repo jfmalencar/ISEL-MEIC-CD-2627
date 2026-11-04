@@ -4,7 +4,7 @@ package grpcserverapp;
 
 import io.grpc.ServerBuilder;
 
-public class GrpcServer {
+public class ManagerServer {
 
     private static int svcPort = 8000;
 
@@ -14,7 +14,7 @@ public class GrpcServer {
             io.grpc.Server svc = ServerBuilder.forPort(svcPort)
                     // Add one or more services.
                     // The Server can host many services in same TCP/IP port
-                    .addService(new ServiceDemoSlides(svcPort))
+                    .addService(new ServiceRegister(svcPort))
                     .build();
             svc.start();
             System.out.println("Server started on port " + svcPort);

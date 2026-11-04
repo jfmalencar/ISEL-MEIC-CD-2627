@@ -1,9 +1,9 @@
 package grpcclientapp;
 
 import com.google.protobuf.ByteString;
-import contracts_discovery.DiscoveryGrpc;
-import contracts_discovery.GetServerResult;
-import contracts_discovery.ProtoVoid;
+import contracts.discovery.DiscoveryGrpc;
+import contracts.discovery.GetServerResult;
+import contracts.discovery.ProtoVoid;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import contracts.execution.*;
