@@ -28,9 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutionService extends ExecutionGrpc.ExecutionImplBase {
-    // O Redis só é conhecido depois do registo no Manager, que acontece
-    // depois de o servidor gRPC arrancar. volatile: é escrito pela thread do main
-    // e lido pelas threads do gRPC.
     private volatile RedisClient redis;
     private final String myAddress;
     private final DockerClient docker;
@@ -53,9 +50,6 @@ public class ExecutionService extends ExecutionGrpc.ExecutionImplBase {
     public void setRedis(RedisClient redis) {
         this.redis = redis;
     }
-
-    // Usar nos métodos do serviço em vez do campo diretamente:
-    // se chegar um pedido antes do registo terminar, o cliente recebe UNAVAILABLE.
     private RedisClient redis() {
         RedisClient r = redis;
         if (r == null) {
