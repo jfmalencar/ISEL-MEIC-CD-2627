@@ -7,7 +7,7 @@ plugins {
 group = "isel.grpc"
 version = "1.0"
 
-val mainClassName = "grpcserverapp.GrpcServer"
+val mainClassName = "grpcserverapp.ManagerServer"
 
 repositories {
     mavenCentral()

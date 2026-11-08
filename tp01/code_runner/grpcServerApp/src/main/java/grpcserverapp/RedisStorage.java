@@ -10,11 +10,17 @@ import java.util.Set;
 public class RedisStorage {
 
     static final String RUN_SERVERS_KEY = "runservers";
-    final String publicAddress = "127.0.0.1";
+    // Endereço do Redis enviado aos RunServers no registo (IP da VM do Manager visto pelas outras VMs)
+    final String publicAddress;
+    // Endereço usado pelo próprio Manager: o Redis corre na mesma VM
     final String host = "localhost";
     final int port = 6379;
 
     RedisClient redis;
+
+    public RedisStorage(String publicAddress) {
+        this.publicAddress = publicAddress;
+    }
 
     public void start() {
         try {
