@@ -24,8 +24,6 @@ public class ShutdownHook extends Thread {
     public void run() {
         System.err.println("*shutdown gRPC server, because JVM is shutting down");
         try {
-            // Initiates an orderly shutdown in which preexisting calls continue
-            // but new calls are rejected. So we can clean and finish work
             svc.shutdown();
             svc.awaitTermination();
             executor.shutdown();

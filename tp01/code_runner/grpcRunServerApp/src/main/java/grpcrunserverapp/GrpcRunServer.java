@@ -1,7 +1,5 @@
 package grpcrunserverapp;
 
-// generic ServerApp for hosting grpcService
-
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -53,8 +51,6 @@ public class GrpcRunServer {
 
             ExecutionService executionService = new ExecutionService(runServerIP + ":" + runServerPort, docker,  executor, baseDir);
             io.grpc.Server svc = ServerBuilder.forPort(runServerPort)
-                    // Add one or more services.
-                    // The Server can host many services in same TCP/IP port
                     .addService(executionService)
                     .build();
             svc.start();
@@ -88,12 +84,9 @@ public class GrpcRunServer {
 
             executionService.setRedis(redis);
             System.out.println("ManagerServer with IP " + managerServerIP + " on Port " + managerServerPort);
-            // Java virtual machine shutdown hook
-            // to capture normal or abnormal exits
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(svc, executor, docker, redis));
 
 
-            // Waits for the server to become terminated
             svc.awaitTermination();
         } catch (Exception ex) {
             ex.printStackTrace();
